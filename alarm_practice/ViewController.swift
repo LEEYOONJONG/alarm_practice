@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class ViewController: UIViewController {
     
@@ -22,6 +23,9 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         Timer.scheduledTimer(timeInterval: interval, target: self, selector: timeSelector, userInfo: nil, repeats: true)
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: {didAllow, Error in
+            print(didAllow)
+        })
     }
 
     @IBAction func changeDatePicker(_ sender: UIDatePicker) {
@@ -43,8 +47,22 @@ class ViewController: UIViewController {
         
         let alarmformatter = DateFormatter()
         alarmformatter.dateFormat = "hh:mm aaa"
+        
         if (alarmformatter.string(from: date as Date) == pickerTime){
             view.backgroundColor = UIColor.orange
+            
+            let content = UNMutableNotificationContent()
+            content.title = "Alarm App Practice"
+            content.subtitle = "GitHub에 커밋할 시각이에요."
+            content.body = "얼른 하세요!"
+            content.badge = 1
+            
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+            
+            let request = UNNotificationRequest(identifier: "commitalert", content: content, trigger: trigger)
+            
+            UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+            
         } else {
             view.backgroundColor = UIColor.yellow
         }
